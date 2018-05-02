@@ -4940,6 +4940,9 @@ int idle_cpu(int cpu)
 		return 0;
 #endif
 
+	if (vcpu_is_preempted(cpu))
+		return 0;
+
 	return 1;
 }
 
