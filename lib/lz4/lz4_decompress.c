@@ -419,7 +419,7 @@ static FORCE_INLINE int LZ4_decompress_generic(
 		    && likely((endOnInput ? ip < shortiend : 1) &
 			      (op <= shortoend))) {
 			/* Copy the literals */
-			memcpy(op, ip, endOnInput ? 16 : 8);
+			LZ4_memcpy(op, ip, endOnInput ? 16 : 8);
 			op += length;
 			ip += length;
 
@@ -530,11 +530,7 @@ static FORCE_INLINE int LZ4_decompress_generic(
 				}
 			}
 
-			/*
-			 * supports overlapping memory regions; only matters
-			 * for in-place decompression scenarios
-			 */
-			LZ4_memmove(op, ip, length);
+			LZ4_memcpy(op, ip, length);
 			ip += length;
 			op += length;
 
