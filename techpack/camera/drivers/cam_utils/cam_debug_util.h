@@ -129,11 +129,7 @@ const char *cam_get_module_name(unsigned int module_id);
  * @fmt      :  Formatted string which needs to be print in log
  * @args     :  Arguments which needs to be print in log
  */
-#define CAM_TRACE(__module, fmt, args...)                                      \
-	({                                                                     \
-		cam_debug_trace(CAM_TYPE_TRACE, __module, __func__, __LINE__,  \
-			fmt, ##args);                                          \
-	})
+#define CAM_TRACE(__module, fmt, args...)
 
 /*
  * CAM_ERR
@@ -148,8 +144,6 @@ const char *cam_get_module_name(unsigned int module_id);
 		pr_info("CAM_ERR: %s: %s: %d " fmt "\n",                       \
 			cam_get_module_name(__module), __func__,               \
 			__LINE__, ##args);                                     \
-		cam_debug_trace(CAM_TYPE_ERR, __module, __func__, __LINE__,    \
-			fmt, ##args);                                          \
 	})
 
 /*
@@ -165,8 +159,6 @@ const char *cam_get_module_name(unsigned int module_id);
 		pr_info("CAM_WARN: %s: %s: %d " fmt "\n",                      \
 			cam_get_module_name(__module), __func__,               \
 			__LINE__, ##args);                                     \
-		cam_debug_trace(CAM_TYPE_ERR, __module, __func__, __LINE__,    \
-			fmt, ##args);                                          \
 	})
 
 /*
@@ -182,8 +174,6 @@ const char *cam_get_module_name(unsigned int module_id);
 		pr_info("CAM_INFO: %s: %s: %d " fmt "\n",                      \
 			cam_get_module_name(__module), __func__,               \
 			__LINE__, ##args);                                     \
-		cam_debug_trace(CAM_TYPE_INFO, __module, __func__, __LINE__,   \
-			fmt, ##args);                                          \
 	})
 
 /*
@@ -199,8 +189,6 @@ const char *cam_get_module_name(unsigned int module_id);
 		pr_info_ratelimited("CAM_INFO: %s: %s: %d " fmt "\n",          \
 			cam_get_module_name(__module), __func__,               \
 			__LINE__, ##args);                                     \
-		cam_debug_trace(CAM_TYPE_INFO, __module, __func__, __LINE__,   \
-			fmt, ##args);                                          \
 	})
 
 /*
@@ -211,8 +199,7 @@ const char *cam_get_module_name(unsigned int module_id);
  * @fmt      :  Formatted string which needs to be print in log
  * @args     :  Arguments which needs to be print in log
  */
-#define CAM_DBG(__module, fmt, args...)                            \
-	cam_debug_log(__module, __func__, __LINE__, fmt, ##args)
+#define CAM_DBG(__module, fmt, args...)
 
 /*
  * CAM_ERR_RATE_LIMIT
@@ -223,8 +210,6 @@ const char *cam_get_module_name(unsigned int module_id);
 		pr_info_ratelimited("CAM_ERR: %s: %s: %d " fmt "\n",           \
 			cam_get_module_name(__module), __func__,               \
 			__LINE__, ##args);                                     \
-		cam_debug_trace(CAM_TYPE_INFO, __module, __func__, __LINE__,   \
-			fmt, ##args);                                          \
 	})
 /*
  * CAM_WARN_RATE_LIMIT
@@ -239,8 +224,6 @@ const char *cam_get_module_name(unsigned int module_id);
 		pr_info_ratelimited("CAM_WARN: %s: %s: %d " fmt "\n",          \
 			cam_get_module_name(__module), __func__,               \
 			__LINE__, ##args);                                     \
-		cam_debug_trace(CAM_TYPE_WARN, __module, __func__, __LINE__,   \
-			fmt, ##args);                                          \
 	})
 
 /*
@@ -263,8 +246,6 @@ const char *cam_get_module_name(unsigned int module_id);
 				"CAM_WARN: %s: %s: %d " fmt "\n",              \
 				cam_get_module_name(__module), __func__,       \
 				__LINE__, ##args);                             \
-		cam_debug_trace(CAM_TYPE_WARN, __module, __func__, __LINE__,   \
-			fmt, ##args);                                          \
 	})
 
 /*
@@ -287,8 +268,6 @@ const char *cam_get_module_name(unsigned int module_id);
 				"CAM_INFO: %s: %s: %d " fmt "\n",              \
 				cam_get_module_name(__module), __func__,       \
 				__LINE__, ##args);                             \
-		cam_debug_trace(CAM_TYPE_INFO, __module, __func__, __LINE__,   \
-			fmt, ##args);                                          \
 	})
 
 /*
@@ -311,8 +290,6 @@ const char *cam_get_module_name(unsigned int module_id);
 				"CAM_ERR: %s: %s: %d " fmt "\n",              \
 				cam_get_module_name(__module), __func__,      \
 				__LINE__, ##args);                            \
-		cam_debug_trace(CAM_TYPE_ERR, __module, __func__, __LINE__,   \
-			fmt, ##args);                                         \
 	})
 
 /**
