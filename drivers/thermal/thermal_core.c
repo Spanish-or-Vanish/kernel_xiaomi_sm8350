@@ -70,6 +70,10 @@ static char boost_buf[128];
 const char *board_sensor;
 static char board_sensor_temp[128];
 static char board_sensor_second_temp[128];
+static int lock_enable = 1;
+static int lock_sconfig = 9;
+module_param(lock_enable, int, 0644);
+module_param(lock_sconfig, int, 0644);
 #endif
 
 /*
@@ -1826,7 +1830,10 @@ thermal_sconfig_store(struct device *dev,
 
 	val = simple_strtol(buf, NULL, 10);
 
-	atomic_set(&switch_mode, val);
+	if(lock_enable)
+		atomic_set(&switch_mode, lock_sconfig);
+	else
+		atomic_set(&switch_mode, val);
 
 	return len;
 }
