@@ -345,3 +345,16 @@ config QORIQ_CPUFREQ
 
 endif
 endmenu
+
+config CPU_FREQ_DUMP_LUT
+	bool "Dump LUT in /proc/cpufreq_lut_dump"
+	default n
+	help
+	  Enable this option to export the CPU frequency lookup table (LUT)
+	  to the file /proc/cpufreq_lut_dump. The LUT includes detailed entries
+	  for each CPU frequency along with the corresponding voltage (in microvolts)
+	  and the number of active cores.
+
+	  This feature is useful for analyzing and fine-tuning custom frequency-voltage
+	  tables, especially when implementing or optimizing CPU overclocking.
+
