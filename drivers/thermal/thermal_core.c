@@ -71,7 +71,7 @@ const char *board_sensor;
 static char board_sensor_temp[128];
 static char board_sensor_second_temp[128];
 static int lock_enable = 1;
-static int lock_sconfig = 9;
+static int lock_sconfig = 10;
 module_param(lock_enable, int, 0644);
 module_param(lock_sconfig, int, 0644);
 #endif
