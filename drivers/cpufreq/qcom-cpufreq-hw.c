@@ -18,6 +18,8 @@
 #include <linux/sched.h>
 #include <linux/slab.h>
 #include <linux/topology.h>
+#include <linux/proc_fs.h>
+#include <linux/seq_file.h>
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/dcvsh.h>
@@ -100,6 +102,21 @@ static const u16 cpufreq_qcom_epss_std_offsets[REG_ARRAY_SIZE] = {
 	[REG_INTR_CLR]		= 0x308,
 	[REG_INTR_STATUS]	= 0x30C,
 };
+
+#ifdef CONFIG_CPU_FREQ_DUMP_LUT
+#define MAX_LUT_ENTRIES 64
+
+struct lut_entry {
+    u32 policy;
+    u32 index;
+    u32 freq_khz;
+    u32 volt_uv;
+    u32 core_count;
+};
+
+static struct lut_entry cpufreq_lut_dump[MAX_LUT_ENTRIES];
+static u32 cpufreq_lut_entry_count = 0;
+#endif
 
 static struct cpufreq_qcom *qcom_freq_domain_map[NR_CPUS];
 static struct cpufreq_counter qcom_cpufreq_counter[NR_CPUS];
@@ -473,6 +490,20 @@ static int qcom_cpufreq_hw_read_lut(struct platform_device *pdev,
 		if (core_count != max_cores)
 			c->table[i].flags  = CPUFREQ_BOOST_FREQ;
 
+#ifdef CONFIG_CPU_FREQ_DUMP_LUT
+		dev_dbg(dev, "Custom LUT: index=%d freq=%d, volt=%d, core_count=%d\n",
+			i, freq, volt, core_count);
+
+		if (cpufreq_lut_entry_count < MAX_LUT_ENTRIES) {
+			cpufreq_lut_dump[cpufreq_lut_entry_count].policy = cpu;
+			cpufreq_lut_dump[cpufreq_lut_entry_count].index = i;
+			cpufreq_lut_dump[cpufreq_lut_entry_count].freq_khz = freq;
+			cpufreq_lut_dump[cpufreq_lut_entry_count].volt_uv = volt;
+			cpufreq_lut_dump[cpufreq_lut_entry_count].core_count = core_count;
+			cpufreq_lut_entry_count++;
+		}
+#endif
+
 		/*
 		 * Two of the same frequencies with the same core counts means
 		 * end of table.
@@ -745,6 +776,35 @@ static const struct of_device_id qcom_cpufreq_hw_match[] = {
 	{}
 };
 
+#ifdef CONFIG_CPU_FREQ_DUMP_LUT
+static int cpufreq_lut_proc_show(struct seq_file *m, void *v)
+{
+    int i;
+    for (i = 0; i < cpufreq_lut_entry_count; i++) {
+        seq_printf(m, "policy=%u, index=%u, freq=%u KHz, volt=%u uV, core_count=%u\n",
+                   cpufreq_lut_dump[i].policy,
+                   cpufreq_lut_dump[i].index,
+                   cpufreq_lut_dump[i].freq_khz,
+                   cpufreq_lut_dump[i].volt_uv,
+                   cpufreq_lut_dump[i].core_count);
+    }
+    return 0;
+}
+
+static int cpufreq_lut_proc_open(struct inode *inode, struct file *file)
+{
+    return single_open(file, cpufreq_lut_proc_show, NULL);
+}
+
+static const struct file_operations cpufreq_lut_proc_fops = {
+    .owner   = THIS_MODULE,
+    .open    = cpufreq_lut_proc_open,
+    .read    = seq_read,
+    .llseek  = seq_lseek,
+    .release = single_release,
+};
+#endif
+
 static struct platform_driver qcom_cpufreq_hw_driver = {
 	.probe = qcom_cpufreq_hw_driver_probe,
 	.remove = qcom_cpufreq_hw_driver_remove,
@@ -756,6 +816,10 @@ static struct platform_driver qcom_cpufreq_hw_driver = {
 
 static int __init qcom_cpufreq_hw_init(void)
 {
+#ifdef CONFIG_CPU_FREQ_DUMP_LUT
+	// path: /proc/cpufreq_lut_dump
+	proc_create("cpufreq_lut_dump", 0444, NULL, &cpufreq_lut_proc_fops);
+#endif
 	return platform_driver_register(&qcom_cpufreq_hw_driver);
 }
 subsys_initcall(qcom_cpufreq_hw_init);
