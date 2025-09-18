@@ -1,0 +1,28 @@
+diff a/fs/namespace.c b/fs/namespace.c	(rejected hunks)
+@@ -949,11 +1047,26 @@ static struct mount *skip_mnt_tree(struct mount *p)
+ struct vfsmount *vfs_create_mount(struct fs_context *fc)
+ {
+ 	struct mount *mnt;
++#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
++	struct mount *m;
++	struct mnt_namespace *mnt_ns;
++	int mnt_id;
++#endif
+ 
+ 	if (!fc->root)
+ 		return ERR_PTR(-EINVAL);
+ 
++#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
++	// For newly created mounts, the only caller process we care is KSU
++	if (unlikely(susfs_is_current_ksu_domain())) {
++		mnt = alloc_vfsmnt(fc->source ?: "none", true, 0);
++		goto bypass_orig_flow;
++	}
++	mnt = alloc_vfsmnt(fc->source ?: "none", false, 0);
++bypass_orig_flow:
++#else
+ 	mnt = alloc_vfsmnt(fc->source ?: "none");
++#endif
+ 	if (!mnt)
+ 		return ERR_PTR(-ENOMEM);
+ 
