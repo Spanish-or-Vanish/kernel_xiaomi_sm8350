@@ -1,0 +1,12 @@
+diff a/fs/exec.c b/fs/exec.c	(rejected hunks)
+@@ -66,6 +66,10 @@
+ #include <linux/io_uring.h>
+ 
+ #include <linux/uaccess.h>
++#ifdef CONFIG_KSU_SUSFS_SUS_SU
++#include <linux/susfs_def.h>
++#endif
++
+ #include <asm/mmu_context.h>
+ #include <asm/tlb.h>
+ 
